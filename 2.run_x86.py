@@ -11,26 +11,31 @@ import multiprocessing as mp
 
 os.environ['M5_CPU2006'] = '/home/lfd/Tools/CPU2006/'
 
-def run(bench, l2_size, l2_assoc, num_threads):
-    dir = 'results/' + bench + '/' + l2_size + '/' + str(l2_assoc) + 'way/' + str(num_threads) + 'c/'
+def run(bench, l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, num_threads):
+    dir = 'results/' + bench + '/' + l2_size + '/' + str(l2_assoc) + 'way/' \
+          + str(l2_stride_prefetcher)  + '-' + str(l2_tagged_prefetcher) + '/' + str(num_threads) + 'c/'
 
     os.system('rm -fr ' + dir)
     os.system('mkdir -p ' + dir)
 
-    cmd_run = '../gem5/build/X86_MESI_Two_Level/gem5.opt -d ' + dir + ' ../gem5/configs/example/se.py --cpu-type=timing --num-cpus=' \
+    cmd_run = '../gem5/build/X86_MESI_Two_Level/gem5.debug -d ' + dir + ' ../gem5/configs/example/se.py --cpu-type=timing --num-cpus=' \
               + str(num_threads) + ' --fast-forward=200000 --maxinsts=200000' \
               + ' --bench=' + bench + ' --mem-size=4GB' \
               + ' --caches --l2cache --num-l2caches=1' \
-              + ' --l1d_size=32kB --l1i_size=32kB --l2_size=' + l2_size + ' --l2_assoc=' + str(l2_assoc) \
-              + ' --l2_queued_prefetcher --l2_stride_prefetcher --l2_tagged_prefetcher'
+              + ' --l1d_size=32kB --l1i_size=32kB --l2_size=' + l2_size + ' --l2_assoc=' + str(l2_assoc)
+
+    if l2_stride_prefetcher:
+        cmd_run = cmd_run + ' --l2_stride_prefetcher'
+    if l2_tagged_prefetcher:
+        cmd_run = cmd_run + ' --l2_tagged_prefetcher'
 
     print(cmd_run)
     os.system(cmd_run)
 
 
 def run_experiment(args):
-    bench, l2_size, l2_assoc, num_threads = args
-    run(bench, l2_size, l2_assoc, num_threads)
+    bench, l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, num_threads = args
+    run(bench, l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, num_threads)
 
 experiments = []
 
@@ -44,22 +49,22 @@ def run_experiments():
     pool.join()
 
 
-def add_experiment(bench, l2_size, l2_assoc, num_threads):
-    args = '-'.join(bench), l2_size, l2_assoc, num_threads
+def add_experiment(bench, l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, num_threads):
+    args = '-'.join(bench), l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, num_threads
     experiments.append(args)
 
 
 def add_experiments(bench, num_threads):
-    # add_experiment(bench, '256kB', 8, 'stride', num_threads)
-    # add_experiment(bench, '256kB', 8, 'tagged', num_threads)
+    # add_experiment(bench, '256kB', 8, False, False, num_threads)
+    # add_experiment(bench, '256kB', 8, False, False, num_threads)
 
-    # add_experiment(bench, '512kB', 8, 'stride', num_threads)
+    # add_experiment(bench, '512kB', 8, False, False, num_threads)
 
-    add_experiment(bench, '1MB', 8, num_threads)
-    # add_experiment(bench, '1MB', 8, num_threads)
-    # add_experiment(bench, '2MB', 8, 'stride', num_threads)
-    # add_experiment(bench, '4MB', 8, 'stride', num_threads)
-    # add_experiment(bench, '8MB', 8, 'stride', num_threads)
+    add_experiment(bench, '1MB', 8, True, True, num_threads)
+    # add_experiment(bench, '1MB', 8, False, False, num_threads)
+    # add_experiment(bench, '2MB', 8, False, False, num_threads)
+    # add_experiment(bench, '4MB', 8, False, False, num_threads)
+    # add_experiment(bench, '8MB', 8, False, False, num_threads)
 
 
 benchmarks = [
