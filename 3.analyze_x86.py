@@ -49,12 +49,29 @@ def parse_results_l2_prefetchers():
                                 l2_tagged_prefetcher=l2_tagged_prefetcher)
                 )
 
+    def l2_prefetchers(r):
+        prefetchers = ''
+
+        l2_stride_prefetcher = bool(r.props['l2_stride_prefetcher'])
+        l2_tagged_prefetcher = bool(r.props['l2_tagged_prefetcher'])
+
+        if l2_stride_prefetcher:
+            prefetchers = prefetchers + '+Stride'
+        if l2_tagged_prefetcher:
+            prefetchers = prefetchers + '+Tagged'
+        if prefetchers == '':
+            prefetchers = 'None'
+
+        prefetchers = prefetchers.strip('+')
+
+        return prefetchers
+
     to_csv('results/l2_prefetchers.csv', results, [
         ('Benchmark', lambda r: r.props['benchmark']),
         # ('L2 Size', lambda r: r.props['l2_size']),
         ('L2 Stride Prefetcher', lambda r: r.props['l2_stride_prefetcher']),
         ('L2 Tagged Prefetcher', lambda r: r.props['l2_tagged_prefetcher']),
-        ('L2 Stride+Tagged Prefetcher', lambda r: str(r.props['l2_stride_prefetcher']) + '+' + str(r.props['l2_tagged_prefetcher'])),
+        ('L2 Prefetchers', lambda r: l2_prefetchers(r)),
         # ('L1D Prefetcher', lambda r: r.props['l1d_prefetcher']),
         ('L2 Prefetches', lambda r: r.stats[0]['system.l2.prefetcher.num_hwpf_issued']),
         # ('L1D Prefetches', lambda r: r.stats[0]['system.cpu.dcache.prefetcher.num_hwpf_issued']),
@@ -73,13 +90,13 @@ def parse_results_l2_prefetchers():
 
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_l2_prefetches.pdf', 'Benchmark', 'L2 Prefetches',
-                   'L2 Stride+Tagged Prefetcher', 'L2 Prefetches')
+                   'L2 Prefetchers', 'L2 Prefetches')
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_l2_miss_rate.pdf', 'Benchmark', 'L2 Miss Rate',
-                   'L2 Stride+Tagged Prefetcher', 'L2 Miss Rate')
+                   'L2 Prefetchers', 'L2 Miss Rate')
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_num_cycles.pdf', 'Benchmark', '# Cycles',
-                   'L2 Stride+Tagged Prefetcher', '# Cycles')
+                   'L2 Prefetchers', '# Cycles')
 
     return results
 
