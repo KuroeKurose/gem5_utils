@@ -1,0 +1,4 @@
+"Benchmark","L2 Stride Prefetcher","L2 Tagged Prefetcher","L2 Stride+Tagged Prefetcher","L2 Prefetches","L2 Miss Rate","# Cycles"
+"429.mcf","False","False","False+False","","0.507183","42450181"
+"429.mcf","False","True","False+True","75989","0.023631","36615030"
+"429.mcf","True","False","True+False","67872","0.260487","39400491"

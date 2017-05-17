@@ -19,8 +19,8 @@ def run(bench, l2_size, l2_assoc, l2_stride_prefetcher, l2_tagged_prefetcher, nu
     os.system('mkdir -p ' + dir)
 
     cmd_run = '../gem5/build/X86_MESI_Two_Level/gem5.debug -d ' + dir + ' ../gem5/configs/example/se.py --cpu-type=timing --num-cpus=' \
-              + str(num_threads) + ' --fast-forward=200000 --maxinsts=200000' \
-              + ' --bench=' + bench + ' --mem-size=4GB' \
+              + str(num_threads) + ' --fast-forward=10000000 --maxinsts=10000000' \
+              + ' --bench=' + bench + ' --mem-size=2GB' \
               + ' --caches --l2cache --num-l2caches=1' \
               + ' --l1d_size=32kB --l1i_size=32kB --l2_size=' + l2_size + ' --l2_assoc=' + str(l2_assoc)
 
@@ -60,7 +60,11 @@ def add_experiments(bench, num_threads):
 
     # add_experiment(bench, '512kB', 8, False, False, num_threads)
 
-    add_experiment(bench, '1MB', 8, True, True, num_threads)
+    add_experiment(bench, '256kB', 8, False, False, num_threads)
+    add_experiment(bench, '256kB', 8, False, True, num_threads)
+    add_experiment(bench, '256kB', 8, True, False, num_threads)
+    # add_experiment(bench, '256kB', 8, True, True, num_threads)
+
     # add_experiment(bench, '1MB', 8, False, False, num_threads)
     # add_experiment(bench, '2MB', 8, False, False, num_threads)
     # add_experiment(bench, '4MB', 8, False, False, num_threads)
@@ -69,11 +73,11 @@ def add_experiments(bench, num_threads):
 
 benchmarks = [
       # '400.perlbench',
-      '401.bzip2',
+      # '401.bzip2',
       # '403.gcc',
       # '410.bwaves',
       # '416.gamess',
-      # '429.mcf',
+      '429.mcf',
       #'433.milc',
       #'434.zeusmp',
       #'435.gromacs',

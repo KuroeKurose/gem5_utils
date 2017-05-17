@@ -3,11 +3,11 @@ from gem5_utils import parse_result, to_csv, generate_plot
 
 # Define benchmark names.
 benchmarks = [
-      '400.perlbench',
-      '401.bzip2',
-      '403.gcc',
-      '410.bwaves',
-      '416.gamess',
+      # '400.perlbench',
+      # '401.bzip2',
+      # '403.gcc',
+      # '410.bwaves',
+      # '416.gamess',
       '429.mcf',
       #'433.milc',
       #'434.zeusmp',
@@ -36,20 +36,25 @@ def parse_results_l2_prefetchers():
     results = []
 
     for benchmark in benchmarks:
-        for l2_size in ['1MB']:
-            for l2_prefetcher in ['stride', 'tagged']:
+        for l2_size in ['256kB']:
+            for (l2_stride_prefetcher, l2_tagged_prefetcher) in [(False, False), (False, True), (True, False)]:
+            # for l2_stride_prefetcher in [False, True]:
+            #     for l2_tagged_prefetcher in [False, True]:
                 results.append(
                     parse_result('results/' +
-                                benchmark + '/' + l2_size + '/8way/l2_' + l2_prefetcher + '/1c/',
+                                benchmark + '/' + l2_size + '/8way/' + str(l2_stride_prefetcher)  + '-' + str(l2_tagged_prefetcher) + '/1c/',
                                 benchmark=benchmark,
                                 l2_size=l2_size,
-                                l2_prefetcher=l2_prefetcher)
+                                l2_stride_prefetcher=l2_stride_prefetcher,
+                                l2_tagged_prefetcher=l2_tagged_prefetcher)
                 )
 
     to_csv('results/l2_prefetchers.csv', results, [
         ('Benchmark', lambda r: r.props['benchmark']),
         # ('L2 Size', lambda r: r.props['l2_size']),
-        ('L2 Prefetcher', lambda r: r.props['l2_prefetcher']),
+        ('L2 Stride Prefetcher', lambda r: r.props['l2_stride_prefetcher']),
+        ('L2 Tagged Prefetcher', lambda r: r.props['l2_tagged_prefetcher']),
+        ('L2 Stride+Tagged Prefetcher', lambda r: str(r.props['l2_stride_prefetcher']) + '+' + str(r.props['l2_tagged_prefetcher'])),
         # ('L1D Prefetcher', lambda r: r.props['l1d_prefetcher']),
         ('L2 Prefetches', lambda r: r.stats[0]['system.l2.prefetcher.num_hwpf_issued']),
         # ('L1D Prefetches', lambda r: r.stats[0]['system.cpu.dcache.prefetcher.num_hwpf_issued']),
@@ -68,13 +73,13 @@ def parse_results_l2_prefetchers():
 
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_l2_prefetches.pdf', 'Benchmark', 'L2 Prefetches',
-                   'L2 Prefetcher', 'L2 Prefetches')
+                   'L2 Stride+Tagged Prefetcher', 'L2 Prefetches')
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_l2_miss_rate.pdf', 'Benchmark', 'L2 Miss Rate',
-                   'L2 Prefetcher', 'L2 Miss Rate')
+                   'L2 Stride+Tagged Prefetcher', 'L2 Miss Rate')
     generate_plot('results/l2_prefetchers.csv',
                   'results/l2_prefetchers_vs_num_cycles.pdf', 'Benchmark', '# Cycles',
-                   'L2 Prefetcher', '# Cycles')
+                   'L2 Stride+Tagged Prefetcher', '# Cycles')
 
     return results
 
