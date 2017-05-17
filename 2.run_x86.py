@@ -63,7 +63,7 @@ def add_experiments(bench, num_threads):
     add_experiment(bench, '256kB', 8, False, False, num_threads)
     add_experiment(bench, '256kB', 8, False, True, num_threads)
     add_experiment(bench, '256kB', 8, True, False, num_threads)
-    # add_experiment(bench, '256kB', 8, True, True, num_threads)
+    add_experiment(bench, '256kB', 8, True, True, num_threads)
 
     # add_experiment(bench, '1MB', 8, False, False, num_threads)
     # add_experiment(bench, '2MB', 8, False, False, num_threads)
@@ -74,10 +74,10 @@ def add_experiments(bench, num_threads):
 benchmarks = [
       # '400.perlbench',
       # '401.bzip2',
-      # '403.gcc',
-      # '410.bwaves',
-      # '416.gamess',
-      '429.mcf',
+      '403.gcc',
+      '410.bwaves',
+      '416.gamess',
+      # '429.mcf',
       #'433.milc',
       #'434.zeusmp',
       #'435.gromacs',

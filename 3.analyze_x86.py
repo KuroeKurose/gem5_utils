@@ -5,9 +5,9 @@ from gem5_utils import parse_result, to_csv, generate_plot
 benchmarks = [
       # '400.perlbench',
       # '401.bzip2',
-      # '403.gcc',
-      # '410.bwaves',
-      # '416.gamess',
+      '403.gcc',
+      '410.bwaves',
+      '416.gamess',
       '429.mcf',
       #'433.milc',
       #'434.zeusmp',
@@ -37,7 +37,7 @@ def parse_results_l2_prefetchers():
 
     for benchmark in benchmarks:
         for l2_size in ['256kB']:
-            for (l2_stride_prefetcher, l2_tagged_prefetcher) in [(False, False), (False, True), (True, False)]:
+            for (l2_stride_prefetcher, l2_tagged_prefetcher) in [(False, False), (False, True), (True, False), (True, True)]:
             # for l2_stride_prefetcher in [False, True]:
             #     for l2_tagged_prefetcher in [False, True]:
                 results.append(
@@ -66,6 +66,12 @@ def parse_results_l2_prefetchers():
 
         return prefetchers
 
+    def l2_prefetches(r):
+        if r.stats[0]['system.l2.prefetcher.num_hwpf_issued'] is None or r.stats[0]['system.l2.prefetcher.num_hwpf_issued'] == '':
+            return 0
+        else:
+            return int(r.stats[0]['system.l2.prefetcher.num_hwpf_issued'])
+
     to_csv('results/l2_prefetchers.csv', results, [
         ('Benchmark', lambda r: r.props['benchmark']),
         # ('L2 Size', lambda r: r.props['l2_size']),
@@ -73,12 +79,13 @@ def parse_results_l2_prefetchers():
         ('L2 Tagged Prefetcher', lambda r: r.props['l2_tagged_prefetcher']),
         ('L2 Prefetchers', lambda r: l2_prefetchers(r)),
         # ('L1D Prefetcher', lambda r: r.props['l1d_prefetcher']),
-        ('L2 Prefetches', lambda r: r.stats[0]['system.l2.prefetcher.num_hwpf_issued']),
+        ('L2 Prefetches', lambda r: l2_prefetches(r)),
         # ('L1D Prefetches', lambda r: r.stats[0]['system.cpu.dcache.prefetcher.num_hwpf_issued']),
         ('L2 Miss Rate', lambda r: r.stats[0]['system.l2.overall_miss_rate::total']),
         # ('L1D Miss Rate', lambda r: r.stats[0]['system.cpu.dcache.overall_miss_rate::total']),
 
-        ('# Cycles', lambda r: r.stats[0]['system.switch_cpus.numCycles'])
+        ('# Cycles', lambda r: r.stats[0]['system.switch_cpus.numCycles']),
+        ('Simulation Time', lambda r: r.stats[0]['host_seconds'])
     ])
 
     # generate_plot('results/l2_prefetchers.csv',
